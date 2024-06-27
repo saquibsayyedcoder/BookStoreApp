@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useForm } from "react-hook-form"
+import axios from 'axios';
 
 function Login() {
   const {
@@ -9,17 +10,43 @@ function Login() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {
+    const userInfo={
+      email:data.email,
+      password:data.password,
+    };
+    await axios.post("http://localhost:4001/user/login", userInfo)
+    .then ((res) => {
+      console.log(res.data);
+      if(res.data){
+        alert("Login Successfull");
+        document.getElementById("my_model_3").close()
+        setTimeout(()=> {
+          window.location.reload();
+          localStorage.setItem("User", JSON.stringify(res.data.user));
+        }, 1000);
+      }
+    })
+    .catch((err) => {
+      if(err.response){
+        console.log(err);
+        alert("Error:" + err.response.data.message);
+        setTimeout(()=>{}, 2000);
+      }
+     
+    });
+  }
   
   return (
 <div>
  <dialog id="my_modal_3" className="modal">
-  <div className="modal-box">
+  <div className="modal-box dark:bg-slate-900 dark:text-white">
     <form onSubmit={handleSubmit(onSubmit)} method="dialog">
       {/* if there is a button in form, it will close the modal */}
-      <Link to="/" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</Link>
+      <Link to="/" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      onClick={() => document.getElementById("my_model_3").closest()}>✕</Link>
    
-    <h3 className="font-bold text-lg">Login</h3>
+    <h3 className="font-bold text-lg ">Login</h3>
 
     {/* Create Email */}
 
